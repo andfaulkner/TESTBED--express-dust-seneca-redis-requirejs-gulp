@@ -1,0 +1,22 @@
+{
+    "restartable": "rs",
+    "verbose": true,
+    "execMap": {
+        "js": "node --harmony --use_strict --harmony_scoping --harmony_modules"
+    },
+    "watch": [
+        "./server.js",
+        "./",
+        "./views/",
+        "./routes/",
+        "./bin/"
+    ],
+    "ignore": [".git", "node_modules", "bower_components", ".sass-cache",
+        "gulpfile.js", "webpack.*", "nodemon.json", "*.sublime-*",
+        "*.diff", "*.log", ".cvsignore", ".gitignore"
+    ],
+    "env": {
+        "NODE_ENV": "development"
+    },
+    "ext": "js json html htm css scss png svg jpg gif txt hbs ejs rb xml jpeg avi mp3 mp4 mpg py txt env"
+}
