@@ -26,6 +26,7 @@ var p = require('gulp-packages')(gulp, [
     'print',
     'rename',
     'replace',
+    'rimraf',
     'sass',
     'shell',
     'size',
@@ -66,22 +67,31 @@ args = (function populateArgs(argList, argObj){
 
 
 ////------------------------------ Constants -------------------------------//
+// PATHS = {
+//     root: { DEST: "./build/", SRC: "./_src/" },
+//     subpaths: ['bin', 'middlewares', 'helpers', 'public',
+//                'public/javascripts', 'public/stylesheets',
+//                'public/images', 'routes', 'views']
+// };
+
 DEST = {
-        root: './',
-        bin: './bin/',
-        middlewares: './middlewares/',
-        public: './public/',
-        client_js: './public/javascripts/',
-        css: './public/stylesheets/',
-        images: './public/images/',
-        routes: './routes/',
-        views: './views/'
+        root: './build/',
+        bin: './build/bin/',
+        middlewares: './build/middlewares/',
+        helpers: './build/helpers/',
+        public: './build/public/',
+        client_js: './build/public/javascripts/',
+        css: './build/public/stylesheets/',
+        images: './build/public/images/',
+        routes: './build/routes/',
+        views: './build/views/'
 };
 
 SRC = {
         root: './_src/',
         bin: './_src/bin/',
         middlewares: './_src/middlewares/',
+        helpers: './_src/helpers/',
         public: './_src/public/',
         client_js: './_src/public/javascripts/',
         css: '/_src/public/stylesheets/',
@@ -136,48 +146,38 @@ gulp.task('js', function js() {
         .pipe(gulp.dest(DEST.js));
 });
 
-var buildJS = function buildJS(src, dest){
-    console.log("entered buildJS");
-    console.log(gulp.src);
-    return gulp.src(src)
-        .pipe(consoleTaskReport())
-        .pipe(p.babel({
-            compact: false
-        }))
-        .pipe(p.dev("got here!"))
-        .pipe(dest);
-};
 
-gulp.task('default', function(){
-    var files = [
-        {src: SRC.bin + 'www', dest: DEST.bin + 'www' },
-        {src: SRC.middlewares + '**/*.js', dest: DEST.middlewares + '**/*.js' },
-        {src: SRC.routes + '**/*.js', dest: DEST.routes + '**/*.js' }
+gulp.task('mkJsBin', function(){
+    gulp.src(DEST.bin + 'www.js')
+        .pipe(consoleTaskReport())
+        .pipe(p.rename('www'))
+        .pipe(gulp.dest(DEST.bin));
+    return gulp.src(DEST.bin + 'www.js')
+        .pipe(p.rimraf({ force: true }));
+});
+
+
+gulp.task('jsBuild', function(){
+    var jsFileOps = [
+        {src: SRC.bin + 'www', dest: DEST.bin },
+        {src: SRC.middlewares + '**/*.js', dest: DEST.middlewares },
+        {src: SRC.client_js + '**/*.js', dest: DEST.client_js },
+        {src: SRC.helpers + '**/*.js', dest: DEST.helpers },
+        {src: SRC.routes + '**/*.js', dest: DEST.routes }
     ];
 
-    var allJsOps = files.map(function(file){
+    return merge(jsFileOps.map(function(file){
         return gulp.src(file.src)
             .pipe(consoleTaskReport())
             .pipe(p.babel({
                 compact: false
              }))
             .pipe(p.dev("got here!"))
-            .pipe(file.dest);
-    });
-    return merge(allJsOps);
-    // files.forEach(function(file){
-    //     console.log(buildJS);
-    //     return buildJS(file.src, file.dest);
-    // }.bind(this));
+            .pipe(gulp.dest(file.dest));
+    }));
 });
 
-// gulp.task('default', function(){
-//     return gulp.src(
-//             //SRC.root + '**/*.js',
-//             SRC.root + 'bin/www'
-//         )
-//         .pipe(p.babel({
-//         compact: false
-//         }))
-//         .pipe(gulp.dest(DEST.root));
-// });
+
+gulp.task('default', function(){
+    runSequence('jsBuild', 'mkJsBin');
+});

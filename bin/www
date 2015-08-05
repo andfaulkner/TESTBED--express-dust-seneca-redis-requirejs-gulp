@@ -7,7 +7,7 @@ require('dotenv').config({ path:
 });
 
 //Setup requires as relative to project root
-require('rootpath')();
+require('rootpath')({ isRelative: true, path: "build"});
 //********************************************************************//
 
 

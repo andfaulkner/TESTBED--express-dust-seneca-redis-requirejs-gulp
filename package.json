@@ -49,6 +49,7 @@
     "gulp-print": "^1.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.3",
+    "gulp-rimraf": "^0.1.1",
     "gulp-sass": "^2.0.4",
     "gulp-shell": "^0.4.2",
     "gulp-size": "^1.2.3",

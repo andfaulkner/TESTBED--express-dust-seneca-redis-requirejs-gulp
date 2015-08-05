@@ -1,0 +1,8 @@
+{
+    "title": "express-test-server-3",
+    "animals": [
+        { "name": "meeka", "type": "dog" },
+        { "name": "coffee", "type": "cat" },
+        { "name": "kyra", "type": "pain in the ass" }
+    ]
+}

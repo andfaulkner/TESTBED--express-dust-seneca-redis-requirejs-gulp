@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 
+
 //************************ RUNTIME ENVIRONMENT ************************//
 //Grab & set environment vars
-require('dotenv').config({ path:
-    '/home/andfaulkner/Projects/express/express-test-3/config/.env'
+'use strict';
+
+require('dotenv').config({ path: '/home/andfaulkner/Projects/express/express-test-3/config/.env'
 });
 
 //Setup requires as relative to project root
 require('rootpath')("bin");
 //********************************************************************//
-
 
 // ACTUAL EXPRESS APP
 var app = require('../app');
@@ -26,8 +27,6 @@ var server;
 
 // port to use for server
 var port;
-
-
 
 //**************************** HELPER FUNCTIONS ****************************//
 /**
@@ -49,7 +48,6 @@ normalizePort = function normalizePort(val) {
     return false;
 };
 
-
 /**
  * Event listener for HTTP server "listening" event
  */
@@ -57,13 +55,10 @@ onListening = function onListening() {
     var addr, bind;
 
     addr = server.address();
-    bind = ((typeof addr === 'string') ?
-        ('pipe ' + addr) :
-        ('port ' + addr.port));
+    bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
 
     debug('Listening on ' + bind);
 };
-
 
 /**
  * Event listener for HTTP server "error" event.
@@ -77,9 +72,7 @@ onError = function onError(error) {
         throw error;
     }
 
-    bind = typeof port === 'string' ?
-        'Pipe ' + port :
-        'Port ' + port;
+    bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
     // handle specific listen errors with friendly messages
     switch (error.code) {
@@ -96,8 +89,6 @@ onError = function onError(error) {
     }
 };
 //***********************************************************************//
-
-
 
 //*************************** LAUNCH SERVER **************************//
 
