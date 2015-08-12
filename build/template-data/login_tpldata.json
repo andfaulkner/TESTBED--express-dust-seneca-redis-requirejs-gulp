@@ -1,3 +1,4 @@
 {
-    "placeholder key": "placeholder value"
+    "route_name": "login",
+    "title": "Login"
 }

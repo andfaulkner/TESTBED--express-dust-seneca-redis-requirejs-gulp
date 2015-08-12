@@ -7,11 +7,12 @@
     },
 
     "topLevelRoutes": [
-        { "route": "users" },
-        { "route": "", "file": "index" },
-        { "route": "img-load-async" },
-        { "route": "login" },
-        { "route": "iife-tpl" }
+        {   "route": "users"            },
+        {   "route": "img-load-async"   },
+        {   "route": "login"            },
+        {   "route": "iife-tpl"         },
+        {   "route": "",
+            "file": "index"             }
     ],
     "testRoute": {
         "route": "iife-tpl"

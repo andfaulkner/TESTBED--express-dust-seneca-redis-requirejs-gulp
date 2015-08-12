@@ -24,10 +24,6 @@
         // resp.send('OK');
     });
 
-    router.post('/test', function (req, resp, next) {
-        resp.send('OK');
-    });
-
     // /home/andfaulkner/Projects/express/express-test-3/_src/routes/index.js
     module.exports = router;
 })();

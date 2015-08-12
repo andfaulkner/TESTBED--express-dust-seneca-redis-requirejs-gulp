@@ -37,12 +37,14 @@ module.exports = (function () {
     /**/console.dir(context);console.log(mn + '(PROTO) TEMPLATE DATA END');
 
     /****************************** ROUTES ******************************/
-    /*
-     * GET dataTpls ROOT PAGE.
-     */
+    /* GET dataTpls ROOT PAGE */
     router.get('/', function (req, resp, next) {
       /**/console.log(mn + '(PROTO) REQUEST FOR /' + base_name);
       resp.render(base_name + '_view', context);
+    });
+
+    router.post('/', function (req, resp, next) {
+      resp.send('OK\n');
     });
     /********************************************************************/
 
