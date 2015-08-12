@@ -1,0 +1,108 @@
+#!/usr/bin/env node
+'use strict';
+
+(function expressLauncher() {
+
+    //************************ RUNTIME ENVIRONMENT ************************//
+    //Grab & set environment vars
+    require('dotenv').config({ path: '/home/andfaulkner/Projects/testbed/express-testbed/config/.env'
+    });
+
+    //Setup requires as relative to project root
+    require('rootpath')({ isRelative: true, path: "build" });
+    //********************************************************************//
+
+    // ACTUAL EXPRESS APP
+    var app = require('app');
+
+    // MODULE DEPENDENCIES
+    var debug = require('debug')('express-test-3:server');
+    var http = require('http');
+
+    // FUNCTIONS
+    var onListening, onError, normalizePort;
+
+    // SERVER to host express app
+    var server;
+
+    // PORT to use for server
+    var port;
+
+    //**************************** HELPER FUNCTIONS ****************************//
+    /**
+     * Normalize a port into a number, string, or false.
+     * @param {Number} val - port number - non-normalized
+     * @returns {Number|String|false} normalized port number; false if failed
+     */
+    normalizePort = function normalizePort(val) {
+        var port = parseInt(val, 10);
+
+        if (isNaN(port)) {
+            return val; // named pipe
+        }
+
+        if (port >= 0) {
+            return port; // port number
+        }
+
+        return false;
+    };
+
+    /**
+     * Event listener for HTTP server "listening" event
+     */
+    onListening = function onListening() {
+        var addr, bind;
+
+        addr = server.address();
+        bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+
+        debug('Listening on ' + bind);
+    };
+
+    /**
+     * Event listener for HTTP server "error" event.
+     * @param {Object} error - Error object thrown by http server on failure
+     * @returns {none} --> function exits the application
+     */
+    onError = function onError(error) {
+        var bind;
+
+        if (error.syscall !== 'listen') {
+            throw error;
+        }
+
+        bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+        // handle specific listen errors with friendly messages
+        switch (error.code) {
+            case 'EACCES':
+                console.error(bind + ' requires elevated privileges');
+                process.exit(1);
+                break;
+            case 'EADDRINUSE':
+                console.error(bind + ' is already in use');
+                process.exit(1);
+                break;
+            default:
+                throw error;
+        }
+    };
+    //***********************************************************************//
+
+    //*************************** LAUNCH SERVER **************************//
+
+    // Get port from environment and store in Express
+    port = normalizePort(process.env.PORT || '3000');
+    app.set('port', port);
+
+    // Create HTTP server.
+    server = http.createServer(app);
+
+    //Listen on provided port, on all network interfaces.
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+
+    //***********************************************************************//
+})();

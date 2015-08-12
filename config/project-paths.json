@@ -1,0 +1,17 @@
+{
+    "srcdir":   "./src/",
+    "destdir":  "./build/",
+
+    "js":       ["bin/", "middlewares/",
+                 "app.js", "helpers/",
+                 "public/javascripts/",
+                 "models/", "services/",
+                 "routes/"],
+
+    "scss":     "public/stylesheets/",
+
+    "static":   ["public/images/",
+                 "views/",
+                 "template-data/",
+                 "public/favicon.ico"]
+ }

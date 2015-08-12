@@ -1,0 +1,66 @@
+{
+    "route_name": "users",
+    "title": "Users",
+    "numbers": [1, 5, 2, 6, 8, 22, 14, 53],
+    "foo": {
+        "bar": "bar content!",
+        "barbar": "barbar content!"
+    },
+    "fridge": {
+        "colour": "white",
+        "humming": true,
+        "hasfreezer": true,
+        "numbermagnets": 25,
+        "temperature": 2
+    },
+    "starches": ["chips", "bread", "toast", "croutons", "crackers"],
+    "name": "Meeka",
+    "vegetable": {
+        "colour": "red",
+        "name": "pepper"
+    },
+    "type": "a type!",
+    "fruits": [
+        { "type": "apple", "colour": "red",
+            "subfruit": { "type": "miniapple" } },
+        { "type": "orange", "colour": "orange" },
+        { "type": "pear", "colour": "green" },
+        { "type": "grapefruit", "colour": "yellow" }
+    ],
+    "id_nums": [
+        { "sibling": "megan", "number": 42314 },
+        { "sibling": "eric", "number": 666 },
+        { "id": "andrew_id", "number": 13 },
+        { "number": 3 }
+    ],
+    "profile": [
+        {
+            "name": "Fred",
+            "sex": "male"
+        },{
+            "name": "Oscar",
+            "sex": "male",
+            "age": 45
+        }, {
+          "name": "Meeka"
+        }
+    ],
+    "dogs": [
+        {
+            "name": "Meeka",
+            "age": 4,
+            "colour": "black",
+            "breed": "rottie-shepherd"
+        }, {
+            "name": "Callie",
+            "age": 12,
+            "colour": "black",
+            "breed": "bernese lab rottie-shepherd mountain dog"
+        }, {
+            "name": "Lako",
+            "age": 3,
+            "colour": "gray",
+            "breed": "Husky-shepherd"
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+{>layout/}
+
+<div class="col-fluid-right">
+    {#imgURLs}
+        <img src="{imgURL}" width="180" />
+    {/imgURLs}
+</div>

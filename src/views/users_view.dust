@@ -1,0 +1,95 @@
+{>layout/}
+
+{!--------------- ALIASES ---------------!}
+{<greeting}Hello, Hola<br/>{/greeting}
+
+
+{!--------------------------------------------------!}
+{!***************!} {<head_extend} {!***************!}
+
+
+{!***************!} {/head_extend} {!***************!}
+{!__________________________________________________!}
+
+
+{!--------------------------------------------------!}
+{!*****************!} {<content} {!*****************!}
+
+
+{! Separator helpers !}
+{#starches}
+    {@first}In our pantry, we have {/first}
+    {@last}and {/last}
+    {.}{@sep}, {/sep}
+    {@last}.<br/><br/>{/last}
+{/starches}
+
+{! Logic helpers!}
+{#fridge}
+    We have a fridge!<br/>
+    {?colour} It is {colour}. {/colour}
+    {@eq key=numbermagnets value=25 type="number" } Exactly 25 magnets are stuck to it. {/eq}
+    {@lt key=temperature value=5 type="number" } Internal temperature is below 5 degrees.{/lt}
+    <br/><br/>
+{/fridge}
+
+
+{! Trying conditional sections !}
+{?fruits}
+    There are fruit in the fridge!<br/>
+    <ul>
+        {#fruits}
+            <li>{.type}</li>
+        {/fruits}
+    </ul>
+{:else}
+    We have no fruit :( <br/>
+{/fruits}
+
+{! First use of alias !}
+{+greeting/}
+
+{! trying escape chars & string literals-->inline params !}
+{#id_nums id="{sibling}_id"}
+    {id}: {number} {~lb}{~n}{~rb} {~s} {~s} {~s} {~s} {~s}
+{/id_nums}
+<br /><br />
+
+{! circumventing parent-child key conflicts w inline params !}
+{name}<br />
+{#vegetable root_name=name}
+    {root_name} would rather die than eat a {colour} {name}<br />
+{/vegetable}
+<br />
+
+{! setting default values w inline params !}
+{#profile sex="sex unknown" age="age unknown"}
+    {name}, {sex}, {age} {~n}<br />
+{/profile}
+
+{! sections and :else tags !}
+<h1>Puppies!</h1>
+{#dogs}
+    <b>{name}</b>: {age} year old {colour} {breed}{~n}<br/><br/>
+{:else}
+    There are no puppies :(
+{/dogs}
+
+{! Paths: dot notation !}
+{#numbers}{.}, {/numbers}<br>
+
+{! Paths: reaching into nested contexts !}
+{foo.bar}<br />
+
+{! Second use of alias - testing !}
+{+greeting/}
+{!*****************!} {/content} {!*****************!}
+{!__________________________________________________!}
+
+{!--------------------------------------------------!}
+{!**************!} {<content_prev} {!***************!}
+{_SUPER_}
+<u><b>Appears at beginning of page because of partials</b></u><br>
+
+{!**************!} {/content_prev} {!***************!}
+{!__________________________________________________!}

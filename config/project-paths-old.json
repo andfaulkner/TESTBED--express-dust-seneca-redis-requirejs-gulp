@@ -1,0 +1,38 @@
+{
+    "srcdir": "./src/",
+    "destdir": "./build/",
+    "SRC": {
+        "root": "./src/",
+        "bin": "./src/bin/",
+        "middlewares": "./src/middlewares/",
+        "helpers": "./src/helpers/",
+        "public": "./src/public/",
+        "client_js": "./src/public/javascripts/",
+        "styles": "./src/public/stylesheets/",
+        "models": "./src/models/",
+        "images": "./src/public/images/",
+        "services": "./src/services/",
+        "routes": "./src/routes/",
+        "favicon": "./src/public/favicon.ico",
+        "views": "./src/views/",
+        "templatedata": "./src/template-data/"
+    },
+    "DEST": {
+        "root": "./build/",
+        "bin": "./build/bin/",
+        "middlewares": "./build/middlewares/",
+        "helpers": "./build/helpers/",
+        "public": "./build/public/",
+        "client_js": "./build/public/javascripts/",
+        "models": "./build/models/",
+        "styles": "./build/public/stylesheets/",
+        "images": "./build/public/images/",
+        "services": "./build/services/",
+        "routes": "./build/routes/",
+        "favicon": "./build/public/",
+        "views": "./build/views/",
+        "html": "./build/public/html/",
+        "compiledTpls": "./build/compiled-templates/",
+        "templatedata": "./build/template-data/"
+    }
+}

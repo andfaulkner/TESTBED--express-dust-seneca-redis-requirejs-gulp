@@ -1,0 +1,38 @@
+{
+    "PATHS": [
+        {  "root": {
+                "SRC": "./src/",
+                "DEST": "./build" } },
+        {  "bin": {
+                "SRC": "./src/bin/",
+                "DEST": "./build/bin/" } }
+        {  "middlewares": {
+                "SRC": "./src/middlewares/",
+                "DEST": "./build/middlewares/" } },
+        {  "helpers": {
+                "SRC": "./src/helpers/",
+                "DEST": "./build/helpers/" } },
+        {  "public": {
+                "SRC": "./src/public/",
+                "DEST": "./build/public/" } },
+        {  "client_js": {
+                "SRC": "./src/public/javascripts/",
+                "DEST": "./build/public/javascripts/" } },
+        {  "styles": {
+                "SRC": "./src/public/stylesheets/",
+                "DEST": "./build/public/stylesheets/" } },
+        {  "images": {
+                "SRC": "./src/public/images/",
+                "DEST": "./build/public/images/" } },
+        {  "favicon": {
+                "SRC": "./src/public/favicon.ico",
+                "DEST": "./build/public/favicon.ico" } },
+        {  "routes": {
+                "SRC": "./src/routes/",
+                "DEST": "./build/routes/" } },
+        {  "views": {
+                "SRC": "./src/views/",
+                "DEST": "./build/views/" } },
+
+    ]
+}

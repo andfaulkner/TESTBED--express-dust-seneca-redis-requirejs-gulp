@@ -2,16 +2,15 @@
     "restartable": "rs",
     "verbose": true,
     "execMap": {
-        "js": "node --harmony --use_strict --harmony_scoping --harmony_modules"
+        "js": "node --harmony --harmony_scoping --harmony_modules"
     },
     "watch": [
-        "./server.js",
-        "./",
-        "./views/",
-        "./routes/",
-        "./bin/"
+        "./build",
+        "./config",
+        "./data"
     ],
-    "ignore": [".git", "node_modules", "bower_components", ".sass-cache",
+    "ignore": [
+        ".git", "node_modules", "bower_components", ".sass-cache",
         "gulpfile.js", "webpack.*", "nodemon.json", "*.sublime-*",
         "*.diff", "*.log", ".cvsignore", ".gitignore"
     ],
