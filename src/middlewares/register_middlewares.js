@@ -56,6 +56,7 @@ module.exports = function(app){
 
     }(middlewareList));
 
+
     // VIEW ENGINE SETUP - allows parsing of dust templates
     app.set('views', path.join(__dirname, '..', 'views'));
 

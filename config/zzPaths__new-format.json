@@ -5,7 +5,7 @@
                 "DEST": "./build" } },
         {  "bin": {
                 "SRC": "./src/bin/",
-                "DEST": "./build/bin/" } }
+                "DEST": "./build/bin/" } },
         {  "middlewares": {
                 "SRC": "./src/middlewares/",
                 "DEST": "./build/middlewares/" } },
@@ -32,7 +32,6 @@
                 "DEST": "./build/routes/" } },
         {  "views": {
                 "SRC": "./src/views/",
-                "DEST": "./build/views/" } },
-
+                "DEST": "./build/views/" } }
     ]
 }

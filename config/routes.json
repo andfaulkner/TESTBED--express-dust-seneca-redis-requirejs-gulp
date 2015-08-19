@@ -3,18 +3,17 @@
     "routeSuffix": "_route",
     "tplData": {
         "dir": "template-data",
-        "filenmSuffix": "_tpldata.json"
+        "filenmSuffix": "_tpldata"
     },
 
     "topLevelRoutes": [
         {   "route": "users"            },
         {   "route": "img-load-async"   },
         {   "route": "login"            },
-        {   "route": "iife-tpl"         },
+        {   "route": "iife-tpl", 
+            "routeConfig": { "launchRoute": true } },
         {   "route": "",
             "file": "index"             }
     ],
-    "testRoute": {
-        "route": "iife-tpl"
-    }
+    "testRoute": { "route": "iife-tpl" }
 }

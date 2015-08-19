@@ -1,6 +1,6 @@
 /**
  * @module app.js
- * Loads the app components
+ * Loads the app components.
  * @return {Express} app: server object
  */
 (function setupExpressApp(){
@@ -22,7 +22,7 @@
     // require('helpers/experiments/node_console_test.js')(false);
     // require('helpers/experiments/node_util.js');
 
-    // DATABASES
+    // DATABASE
     require('models/redis.js');
 
   /****************** ROUTES & ROUTE-HANDLING MODULES *****************/
@@ -31,9 +31,12 @@
     let routes = require('../config/routes.json'); //Get route list
 
     //uses route constructor on all routes registered in the config object
-    routes.topLevelRoutes.forEach(function(routeOpts){
-        let file = routeOpts.file || routeOpts.route;
-        app.use('/' + routeOpts.route, require('routes/proto_route.js')(file));
+    routes.topLevelRoutes.forEach(function(routeOptions){
+        let file = routeOptions.file || routeOptions.route;
+        let routeConfig = routeOptions.routeConfig || { }; 
+        
+        app.use('/' + routeOptions.route, 
+                require('routes/proto_route.js')(file, routeConfig));
     });
   /********************************************************************/
 

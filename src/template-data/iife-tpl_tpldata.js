@@ -12,7 +12,7 @@ var dust1 = require('dustjs-linkedin');
 var context = dust.makeBase();
 
 var newContext = context.push({ 
-        "foo": "barrrrrrrrrr!", 
+        "foo": "barrrrrrrrrroooooooooo!", 
         "one": {
             "two": "Hello!"
         }

@@ -30,6 +30,7 @@ var p = require('gulp-packages')(gulp, [
     'jshint',
     'newer',
     'livereload',
+    'node-inspector',
     'nodemon',
     'notify',
     'plumber',

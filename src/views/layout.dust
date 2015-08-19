@@ -4,7 +4,7 @@
 
     <title>{title}</title>
 
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href='/stylesheets/style.css' />
 
     <script src="/javascripts/{route_name}_frontend.js"></script>
     <script src="/lib/jquery.js"></script>
@@ -14,7 +14,7 @@
     {/styles}
 
     {#scripts}
-        <script src="{scriptpath}" />
+        <script src='{scriptpath}' />
     {/scripts}
 
     {+head_extend/}

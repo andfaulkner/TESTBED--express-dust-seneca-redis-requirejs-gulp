@@ -12,8 +12,9 @@ require('shelljs/global');
 
 //ECMA 6 POLYFILL
 require('babel/register');
-Object.getPrototypeOf.toString = function() {return Object.toString();};
-
+Object.getPrototypeOf.toString = function() { 
+    return Object.toString();
+};
 
 //PIPE COMPONENTS
 var catchErrors, consoleTaskReport, newerThanRootIfNotProduction, rmDebugCode;
@@ -31,30 +32,31 @@ var p = require('gulp-packages')(gulp, [
     'babel',                    // compile ECMA6 --> ECMA5
     'debug',                    // lists all files run thru it
     'dev',                      // Toggle html comments on & off
-    'display-help',
-    'dust',
-    'express',
-    'exit',
-    'if-else',
-    'jshint',
-    'newer',
-    'livereload',
-    'nodemon',
-    'notify',
-    'plumber',
-    'print',
-    'rename',
-    'replace',
-    'rimraf',
-    'sass',
-    'shell',
-    'size',
-    'stats',
-    'tap',
-    'webpack',
+    'display-help',             // Display help file
+    'dust',                     // Compile Dust templates
+    'express',                  // Launch express framework
+    'exit',                     // Force quit Gulp process
+    'filter',                   // Filter out unwanted files from stream
+    'if-else',                  // if-else statements mid-stream
+    'jshint',                   // display Javascript errors
+    'newer',                    // Only push item through pipe if newer
+    'livereload',               // Relaunch in browser automatically
+    'nodemon',                  // Keep server running - restart on crash
+    'notify',                   // Tells you if a reload happens
+    'plumber',                  // keep running if error occurs
+    'print',                    // output errors to console
+    'rename',                   // Rename files
+    'replace',                  // find-and-replace text in files 
+    'rimraf',                   // remove files
+    'sass',                     // compile scss and sass --> css
+    'shell',                    // run shell commands with gulp
+    'size',                     // output file size
+    'stats',                    // provides stats on files passed thru stream
+    'tap',                      // run function mid-stream
+    'webpack',                  // compile webpack
 ]);
 
-//GULP PLUGINS
+//UNPACKAGEABLE GULP PLUGINS
 var gutil = require('gulp-util');
 var lazypipe = require('lazypipe');
 var runSequence = require('run-sequence');
@@ -97,8 +99,9 @@ onError = function onError(err) {
     console.log(gutil.colors.red.bgWhite("-----------------------------------"));
     console.log('ERROR OCCURRED');
     console.log(typeof err);
-    console.log(gutil.colors.red.bgWhite(err));
+    console.log(gutil.colors.red.bgWhite(err.toString()));
     console.log(gutil.colors.red.bgWhite("-----------------------------------"));
+    this.emit('restart');
     this.emit('end');
 };
 
@@ -167,7 +170,9 @@ rmDebugCode = lazypipe()
 //------------------------------------------------------------------------//
 
 
-//****************************** STYLES ******************************//
+//################################################################################
+//#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ STYLES  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//################################################################################
 /**
  * Compile SCSS to CSS, output to build directory.
  */
@@ -180,28 +185,36 @@ gulp.task('sass', function sass() {
         .pipe(p.ifElse( !!args.stats, p.size ))
         .pipe(gulp.dest(filePaths.dest));
 });
-//********************************************************************//
+//#################################################################################
 
 
-//******************************** JS ********************************//
+
+//################################################################################
+//#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ JS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//################################################################################
 /**
  * Transpiles all js files in source directory (/src) from ECMA6 to ECMA5,
  * outputs resultant js files into build directory (/build).
  */
 gulp.task('js-build', function(){
 
-    return merge(PATHS.js.map(function(files){
-        let filePaths = resolveSrcAndDest(files, { ext: "js" });
+    return consoleTaskReport()
+        .pipe(merge(PATHS.js.map(function(files){
+      
+            let swpFilter = p.filter(['*', '!**/*.swp', '!**/*.*~']); 
+            let filePaths = resolveSrcAndDest(files, { ext: "js" });
+            return gulp.src(filePaths.src)
+                .pipe(swpFilter)
+                .pipe(consoleTaskReport())
+                .pipe(p.babel({ compact: false }))
+                    .on('error', onError)
+                .pipe(p.dev("got into js-build end!"))
+                .pipe(gulp.dest(filePaths.dest));
 
-        return gulp.src(filePaths.src)
-            .pipe(consoleTaskReport())
-            .pipe(p.babel({ compact: false }))
-            .on('error', onError)
-            .pipe(p.dev("got here!"))
-            .pipe(gulp.dest(filePaths.dest));
-    }));
+    }))).on('error', onError);
 });
-//********************************************************************//
+//#################################################################################
+
 
 
 /**
@@ -212,7 +225,9 @@ gulp.task('cleanup', function(cb){
 });
 
 
-//************************** STATIC ASSETS ***************************//
+//################################################################################
+//#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ STATIC ASSETS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//################################################################################
 /**
  * Copies static assets from source directory into build directory.
  */
@@ -220,34 +235,42 @@ gulp.task('copy', function copy(){
     return merge(PATHS.static.map(function(files){
         let filePaths = resolveSrcAndDest(files);
 
+        let swpFilter = p.filter(['*', '!**/*.swp', '!**/*.*~']);
+
         //Actually output the files
         return gulp.src(filePaths.src)
+            .pipe(swpFilter)
             .pipe(consoleTaskReport())
             .pipe(p.debug({title: 'copy static assets:'}))
             .pipe(p.ifElse( !!args.stats, p.size ))
             .pipe(gulp.dest(filePaths.dest));
     }));
 });
-//********************************************************************//
+//#################################################################################
+
 
 
 //************************ LIVERELOAD SERVER *************************//
 gulp.task('server', function livereloadServer(){
     livereload.listen();                    // listen for changes
-    p.nodemon({                             // configure nodemon
-        script: 'build/bin/launcher.js',    // the script to run the app
-        ext: 'js dust json css scss sass html htm png jpg gif hbs ejs rb xml jpeg avi mp3 mp4 mpg py txt env'
-    }).on('restart', function(){
-        gulp.src('build/bin/launcher.js')   // when the app restarts, run livereload.
-            .pipe(p.tap(function(file){
-                console.log('\n' + gutil.colors.white.bold.bgGreen('\n' +
-                '     .......... RELOADING PAGE, PLEASE WAIT ..........\n'));
-            }))
-            .pipe(notify({message: 'RELOADING PAGE, PLEASE WAIT', onLast: true}))
-            .pipe(wait(1500))
-            .pipe(livereload());
+    return consoleTaskReport()
+        .pipe(p.nodemon({                       // configure nodemon
+            script: 'build/bin/launcher.js',    // the script to run the app
+            ext: 'js dust json css scss sass html htm png jpg gif hbs ejs rb xml jpeg avi mp3 mp4 mpg py txt env'
+        }).on('restart', function(){
+           livereload.listen();
+           return gulp.src('build/bin/launcher.js')   // when the app restarts, run livereload.
+                .pipe(consoleTaskReport())
+                .pipe(p.tap(function(file){
+                    console.log('\n' + gutil.colors.white.bold.bgGreen('\n' +
+                    '     .......... RELOADING PAGE, PLEASE WAIT ..........\n'));
+                }))
+                .pipe(notify({message: 'RELOADING PAGE, PLEASE WAIT', onLast: true}))
+                .pipe(wait(1500))
+                .pipe(livereload());
+        }));
+//).on('error', onError));
     });
-});
 //********************************************************************//
 
 
