@@ -1,0 +1,6 @@
+{
+    "no-debug-brk": true,
+    "save-live-edit": true,
+    "nodejs": ["--harmony"],
+    "preload": false
+}

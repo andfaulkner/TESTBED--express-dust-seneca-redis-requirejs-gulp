@@ -26,5 +26,11 @@
     {
         "request_path": "",
         "file": "index"
+    },
+    {
+        "request_path": "data_receivers/login",
+        "type": "data_receiver",
+        "POST_function": "login_user"
     }
+
 ]
