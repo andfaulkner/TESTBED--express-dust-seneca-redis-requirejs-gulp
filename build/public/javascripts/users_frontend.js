@@ -1,6 +1,9 @@
+/**
+ * Client-side script for origin/users
+ */
 "use strict";
 
-(function users_route_clientside_script() {
+(function users($) {
 
-    console.log("in users_frontend.js");
-})();
+  console.log("in users_frontend.js");
+})($);

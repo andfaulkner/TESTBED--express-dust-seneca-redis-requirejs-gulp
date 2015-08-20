@@ -1,3 +1,6 @@
+/**
+ * Client-side script for origin/login
+ */
 "use strict";
 
-(function () {})();
+(function login($) {})($);

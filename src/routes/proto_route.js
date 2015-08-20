@@ -7,7 +7,7 @@
  * GET REQUEST TO localhost/[base_name]
  */
 
-var mn = "***** PROTO_ROUTE.JS ***** ::  ";             /**/ console.log(mn + "(PROTO) very top");
+var mn = '***** PROTO_ROUTE.JS ***** ::  ';             /**/ console.log(mn + '(PROTO) very top');
 var stdout = require('helpers/stdout');
 
 
@@ -16,9 +16,9 @@ var stdout = require('helpers/stdout');
 //################################################################################//
 module.exports = (function(){
 
-    /*<PATHS*/ console.log("--------------------+process.env.PWD proto_route.js+------------------------");
+    /*<PATHS*/ console.log('--------------------+process.env.PWD proto_route.js+------------------------');
     /*<PATHS*/ console.log(process.env.PWD);
-    /*<PATHS*/ console.log("--------------------+process.env.PWD+------------------------");
+    /*<PATHS*/ console.log('--------------------+process.env.PWD+------------------------');
 
  /**
   * Builds everything needed to handle a route
@@ -42,15 +42,15 @@ module.exports = (function(){
     var path    = require('path'),
         _       = require('lodash'),
         routes  = require('../../config/routes.json'),
-        fs      = require("fs");
+        fs      = require('fs');
 
     //Log names of files used
-    /**/ console.log('template-data/' + base_name + "_tpldata.[js|json]");
-    /**/ console.log('views/' + base_name + "_view.dust");
+    /**/ console.log('template-data/' + base_name + '_tpldata.[js|json]');
+    /**/ console.log('views/' + base_name + '_view.dust');
 
 
     var tplDataPathBase = path.join('../template-data/' + base_name + '_tpldata');
-    var tplViewPath = path.join('../views/' + base_name + "_view.dust");
+    var tplViewPath = path.join('../views/' + base_name + '_view.dust');
 
     var context;
 
@@ -70,10 +70,12 @@ module.exports = (function(){
     router.get('/', function(req, resp, next) {
         /**/ console.log(mn + '(PROTO) REQUEST FOR /' + base_name);
         resp.render(base_name + '_view', context);
+        next();
     });
 
     router.post('/', function(req, resp, next){
         resp.send('OK\n');
+        next();
     });
     /********************************************************************/
 

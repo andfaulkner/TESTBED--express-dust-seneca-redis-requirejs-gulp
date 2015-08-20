@@ -1,5 +1,9 @@
+/**
+ * Client-side script for origin/obj-lit-ret
+ */
 "use strict";
 
-(function () {
-    alert("runs!");
-})();
+(function objLitRet($) {
+
+  alert("runs!");
+})($);

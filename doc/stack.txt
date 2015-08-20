@@ -1,0 +1,33 @@
+____ CORE ______________________
+--NodeJS
+
+____ SERVER ____________________
+--Express
+--Nginx
+
+____ BUILD SYSTEM ______________
+--Gulp
+--npm
+
+____ CONFIG ____________________
+--JSON
+
+____ HELPER LIBS _______________
+--lodash
+--jQuery
+
+____ FRAMEWORK _________________
+--Seneca
+--RequireJS
+
+____ DB ________________________
+--Redis
+--PostgresSQL
+--ElasticSearch [[[Data searching]]]
+
+____ TEMPLATING ________________
+--DustJS
+
+____ DEV TOOLS _________________
+--Git
+--Jira

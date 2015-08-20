@@ -6,10 +6,8 @@ var path    = require('path'),
     yargs   = require('yargs'),
     merge   = require('merge2'),
     _       = require('lodash'),
-    del     = require('del');
-var Bluebird = require('bluebird');
-var fsa     = Bluebird.promisifyAll(require('fs'));
-
+    del     = require('del'),
+    async   = require('async');
 
 require('shelljs/global');
 
@@ -203,32 +201,26 @@ gulp.task('sass', function sass() {
  * Transpiles all js files in source directory (/src) from ECMA6 to ECMA5,
  * outputs resultant js files into build directory (/build).
  */
-gulp.task('js-build', function(){
+gulp.task('js-build', () =>
+    consoleTaskReport().pipe(merge(PATHS.js.map( (files) => {
+        let filePaths = resolveSrcAndDest(files, { ext: 'js' });
 
-    return consoleTaskReport()
-        .pipe(merge(PATHS.js.map(function(files){
+        return gulp.src(filePaths.src)
+            .pipe(p.filter(['*', '!**/*.swp', '!**/*.*~']))
+            .pipe(consoleTaskReport())
+            .pipe(p.babel({ compact: false }))
+                .on('error', onError)
+            .pipe(p.dev('got into js-build end!'))
+            .pipe(gulp.dest(filePaths.dest));
 
-            let swpFilter = p.filter(['*', '!**/*.swp', '!**/*.*~']);
-            let filePaths = resolveSrcAndDest(files, { ext: 'js' });
-            return gulp.src(filePaths.src)
-                .pipe(swpFilter)
-                .pipe(consoleTaskReport())
-                .pipe(p.babel({ compact: false }))
-                    .on('error', onError)
-                .pipe(p.dev('got into js-build end!'))
-                .pipe(gulp.dest(filePaths.dest));
-
-    }))).on('error', onError);
-});
+    }))).on('error', onError));
 //#################################################################################
 
 
 /**
  * Remove all files from build folder
  */
-gulp.task('cleanup', function(cb){
-    del(['build/**/*'], cb);
-});
+gulp.task( 'cleanup', ((next) => del(['build/**/*'], next)) );
 
 
 //################################################################################
@@ -241,11 +233,9 @@ gulp.task('copy', function copy(){
     return merge(PATHS.static.map(function(files){
         let filePaths = resolveSrcAndDest(files);
 
-        let swpFilter = p.filter(['*', '!**/*.swp', '!**/*.*~']);
-
         //Actually output the files
         return gulp.src(filePaths.src)
-            .pipe(swpFilter)
+            .pipe(p.filter(['*', '!**/*.swp', '!**/*.*~']))
             .pipe(consoleTaskReport())
             .pipe(p.debug({title: 'copy static assets:'}))
             .pipe(p.ifElse( !!args.stats, p.size ))
@@ -255,94 +245,45 @@ gulp.task('copy', function copy(){
 //#################################################################################
 
 
+function fileExists(filePath, callback){
+    fs.stat(filePath, (err, stats) => {
+        if (err) return callback(false);
+        return callback(stats.isFile());
+    });
+}
 
 
-function openOrMake(filePath, isJSConfig, defaultData){
-    console.log('Entered openOrMake');
-
+/**
+ * Each file
+ * @param  {String}  filePath     path of file to check existence of
+ * @param  {Boolean} isJSConfig   if true, will check for .js & .json of filePath
+ *                                (filePath should have no ext in this case), &
+ *                                only make new file if neither exist.
+ * @param  {String}  defaultData  data to write into the file
+ * @return {undefined}
+ */
+function makeDefaultFiles(filePath, isJSConfig, defaultData){
     if (isJSConfig) {
 
-        //CB1
-        fs.open(filePath + '.js', 'r+', function tryToOpenJson(err, fd){
-            console.log('CB LAYER ONE');
-            if (err) {
-                console.log('no ' + filePath + '.js');
+        async.some([filePath + '.js', filePath + '.json'], fileExists, function(result){
 
-                //CB2
-                return fs.open(filePath + '.json', 'r+', function(err, fd){
-                    console.log('CB LAYER TWO');
-                    if (err) {
-                        console.log('no ' + filePath + '.json');
-
-                        //CB3
-                        return fs.writeFile(filePath + '.json', defaultData, function(err){
-                            console.log('CB LAYER THREE');
-                            if (err) {
-                                return (function(){
-                                    console.log('ERROR in fs.writeFile on ' + filePath + '.json');
-                                    console.dir(err);
-                                }());
-                            }
-                            return console.log('new' + filePath + '.json file written!');
-                        });
-                        //END CB3
-
-                    } else return console.log(filePath + '.json already existed!');
-                });
-                //END CB2
-
-            } else return console.log(filePath + '.js already existed! Success!');
+            if (result === true) return;
+            return fs.writeFile(filePath + '.json', defaultData, function(err) {
+                if (err) return console.log('_______openOrMake:: ERROR in fs.writeFile on ' + filePath + '.json. Error: ' + err);
+                return console.log('makeDefaultFiles:: new' + filePath + '.json file written!');
+            });
         });
-        //END CB1
-
-        // //CB1
-        // fs.open(filePath + '.js', 'r+', function(err, fd){
-        //     console.log('CB LAYER ONE');
-        //     if (err) {
-        //         console.log('no ' + filePath + '.js');
-
-        //         //CB2
-        //         return fs.open(filePath + '.json', 'r+', function(err, fd){
-        //             console.log('CB LAYER TWO');
-        //             if (err) {
-        //                 console.log('no ' + filePath + '.json');
-
-        //                 //CB3
-        //                 return fs.writeFile(filePath + '.json', defaultData, function(err){
-        //                     console.log('CB LAYER THREE');
-        //                     if (err) {
-        //                         return (function(){
-        //                             console.log('ERROR in fs.writeFile on ' + filePath + '.json');
-        //                             console.dir(err);
-        //                         }());
-        //                     }
-        //                     return console.log('new' + filePath + '.json file written!');
-        //                 });
-        //                 //END CB3
-
-        //             } else return console.log(filePath + '.json already existed!');
-        //         });
-        //         //END CB2
-
-        //     } else return console.log(filePath + '.js already existed! Success!');
-        // });
-        // //END CB1
-
 
     //if not js/json file
     } else {
 
-        fs.open(filePath, 'r+', function (err, fd){
-            if (err) {
-
-                return fs.writeFile(filePath, defaultData, function(err) {
-                    if (err) return console.log('fs.writeFile ERROR: ' + filePath);
-                    return console.log('fs.writeFile success for ' + filePath);
-                });
-
-            }
+        fileExists(filePath, function(doesExist){
+            if (doesExist === true) return;
+            return fs.writeFile(filePath, defaultData, function(err) {
+                if (err) return console.log('fs.writeFile ERROR: ' + filePath);
+                return console.log('fs.writeFile success for ' + filePath);
+            });
         });
-
     }
 
 }
@@ -351,66 +292,38 @@ function openOrMake(filePath, isJSConfig, defaultData){
 
 
 
+//***************** CREATE FILES IF THEY DON'T EXIST BASED ON CONFIG CONTENTS *****************//
 gulp.task('makeRoutes', function makeRoutes(){
-    //***************** CREATE FILES IF THEY DON'T EXIST *****************//
 
     var routes = require(path.join(__dirname, 'config/routes.json'));
-
     var defJSON = '{"default":"default"}'; //def contents to write if no file
 
-    fs.readFile(path.join(__dirname, 'config/default_view_template.dust'),
-            function(err, dustTmplData) {
+    fs.readFile(path.join(__dirname, 'config/default_view_template.dust'), function(err, dustData) {
         if (err) throw err;
 
-        routes.forEach(function(route) {
-            var fn = (route.file || route.request_path);
-            console.log(fn);
-            var tplDataPathNoExt = path.join(__dirname, 'src/template-data', fn + '_tpldata');
-            var tplViewPath = path.join(__dirname, 'src/views', fn + '_view.dust');
+        fs.readFile(path.join(__dirname, 'config/default_frontend_js_file.js'), function(err, clientJSData) {
 
-            route.routeConfig = route.routeConfig || {};
+            routes.forEach(function(route) {
+                var fn = (route.file || route.request_path);
+                var tplDataPathNoExt = path.join(__dirname, 'src/template-data', fn + '_tpldata'),
+                    tplViewPath = path.join(__dirname, 'src/views', fn + '_view.dust'),
+                    frontendJSPath = path.join(__dirname, 'src/public/javascripts', fn + '_frontend.js');
 
-            var launchRoute = (route.routeConfig.launchRoute || false);
-            console.log(route);
-            console.log(tplDataPathNoExt);
+                makeDefaultFiles( tplDataPathNoExt, true, defJSON );
+                makeDefaultFiles( tplViewPath, false, dustData );
+                makeDefaultFiles( frontendJSPath, false, _.template(clientJSData)(
+                              { routeNameCC: _.camelCase(fn), routeName: fn }
+                ) );
+            });
 
-            openOrMake(tplDataPathNoExt, true, defJSON);
-            openOrMake(tplViewPath, false, dustTmplData);
         });
+
     });
 
     console.log('past forEach');
 
-    // fs.openAsync(tplDataPathBase + '.js', 'r')
-    // .catch(Error, function(e)fs.openAsync.bind(this, tplDataPathBase + '.json'))
-    // .catch(fs.writeFileAsync.bind(this, tplDataPathBase + '.json',
-    //         '{"default":"default"}', function(){
-    //     console.log("wrote json!");
-    // }));
-
-    // ///////////////////////// EXPERIMENT /////////////////////////////
-    // fs.open('build/asdf.js', 'r+', function(err, fd){
-    //     if(err){
-    //         console.log("DID NOT !!!!!!!!!!!!!!!!!!!! OPEN asdf.js!");
-    //         console.dir(err);
-    //     } else {
-    //         console.log("!!!!!!!!!!!!!!!!!!!! OPENED asdf.js!");
-    //         console.dir(fd);
-    //     }
-    // });
-    // //////////////////////////////////////////////////////////////////
-
-
-
-
-    //********************************************************************//
-
 });
-
-
-
-
-
+    //********************************************************************//
 
 
 
@@ -424,11 +337,12 @@ gulp.task('server', function livereloadServer(){
         .pipe(p.nodemon({                       // configure nodemon
             script: 'build/bin/launcher.js',    // the script to run the app
             ext: 'js dust json css scss sass html htm png jpg gif hbs ejs rb xml jpeg avi mp3 mp4 mpg py txt env'
-        }).on('restart', function(){
+
+        }).on('restart', () => {
            livereload.listen();
            return gulp.src('build/bin/launcher.js')   // when the app restarts, run livereload.
                 .pipe(consoleTaskReport())
-                .pipe(p.tap(function(file){
+                .pipe(p.tap(() => {
                     console.log('\n' + gutil.colors.white.bold.bgGreen('\n' +
                     '     .......... RELOADING PAGE, PLEASE WAIT ..........\n'));
                 }))
@@ -436,17 +350,15 @@ gulp.task('server', function livereloadServer(){
                 .pipe(wait(1500))
                 .pipe(livereload());
         }));
-//).on('error', onError));
+
     });
 //#################################################################################
 
-
-gulp.task('watch', function(){
-    gulp.watch(SRC + '**/*.*', ['build'] );
-});
-
 gulp.task('build', ['sass', 'copy', 'js-build'] );
 
-gulp.task('default', function(){
-    runSequence('build', 'watch');
+gulp.task('watch', function(){
+    gulp.watch([SRC + '**/*.*', path.join(__dirname, 'config/**/*.*')], () =>
+        runSequence('makeRoutes', 'build'));
 });
+
+gulp.task('default', () => { runSequence('makeRoutes', 'build', 'watch'); });
