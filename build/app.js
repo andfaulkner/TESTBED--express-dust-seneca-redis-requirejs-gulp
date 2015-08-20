@@ -44,7 +44,11 @@
     routes.forEach(function (route) {
         var file = route.file || route.request_path;
         var routeConfig = route.routeConfig || {};
-        app.use('/' + route.request_path, require('routes/proto_route.js')(file, routeConfig));
+        if (route.type !== "data_receiver") {
+            app.use('/' + route.request_path, require('routes/proto_route.js')(file, routeConfig));
+        } else {
+            app.use('/' + route.request_path, require('routes/proto_data_receiver_route.js')(file, routeConfig));
+        }
     });
     /********************************************************************/
 
