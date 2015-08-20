@@ -26,8 +26,7 @@ module.exports = function dataTpls_route_module(filename) {
     console.log(mn + 'Got express server and all libs');
 
     //TEMPLATE DATA
-    var context = require(routes.tplData.dir + '/' + filename + routes.tplData.filenmSuffix);
-
+    var context = require('template-data/' + filename + routes.tplData.filenmSuffix);
     console.log(mn + 'Got template data. TEMPLATE DATA START::: ');
     console.dir(context);
     console.log(mn + 'TEMPLATE DATA END');

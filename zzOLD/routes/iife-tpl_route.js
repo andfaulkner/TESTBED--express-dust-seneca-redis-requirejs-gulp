@@ -3,7 +3,7 @@ console.log("enters iife-tpl route - very top");
 var mn = "***** IIFE-TPL_ROUTE.JS ***** ::  ";
 
 /**
- * Test route for function-based template testing
+ * Test route for function-based template testing.
  * Linked to /routes/dataTpls_view.dust
  * @return {Router}
  */

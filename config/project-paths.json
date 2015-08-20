@@ -1,5 +1,6 @@
 {
     "srcdir":   "./src/",
+
     "destdir":  "./build/",
 
     "js":       ["bin/", "middlewares/",

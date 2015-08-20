@@ -1,6 +1,6 @@
 /*
  * @module proto_route
- * 
+ *
  * @description
  * PROTOTYPE OF ALL ROUTE FILES - LOADS TEMPLATE-DATA FILE WITH SAME
  * NAME AS ROUTE FILENAME PASSED IN, RENDERS IT -- UPON RECEIVING
@@ -9,75 +9,78 @@
 
 "use strict";
 
-var mn = "***** PROTO_ROUTE.JS ***** ::  ";
-/**/console.log(mn + "(PROTO) very top");
+var mn = "***** PROTO_ROUTE.JS ***** ::  "; /**/console.log(mn + "(PROTO) very top");
+var stdout = require('helpers/stdout');
 
-/** 
- * Test route for function-based template testing.
- * Linked to /routes/dataTpls_view.dust
- * @param {String} base_name - name of route file minus prefixes & suffixes, but
- *                 with relative path included
- * @return {Router}
- */
+//################################################################################//
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~ CONSTRUCTED ROUTE OBJECT ~~~~~~~~~~~~~~~~~~~~~~~~~~//
+//################################################################################//
 module.exports = (function () {
 
-  //################################################################################//
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~ CONSTRUCTED ROUTE OBJECT ~~~~~~~~~~~~~~~~~~~~~~~~~~//
-  //################################################################################//
-  var route_prototype = function route_prototype(base_name, config) {
+    /*<PATHS*/console.log("--------------------+process.env.PWD proto_route.js+------------------------");
+    /*<PATHS*/console.log(process.env.PWD);
+    /*<PATHS*/console.log("--------------------+process.env.PWD+------------------------");
 
-    config = config || {};
+    /**
+     * Builds everything needed to handle a route
+     * @param  {String} base_name - uri path that triggers route e.g. "users"
+     *             triggered by "http://thesite.com/users". Also name of
+     *             template data file (e.g. "template-data/users_tpldata.js")
+     *             & view file (e.g. views/users_view.dust).
+     * @param  {Object} config    - provide properties to alter route handling:
+     *                  |-> .launchRoute: true to "execute" template file - use
+     *                                    if it's a js rather than json module
+     * @return {Router}
+     */
+    var route_prototype = function route_prototype(base_name, config) {
+        config = config || {};
 
-    /**/console.log(mn + "(PROTO) enters route");
-    /**/console.log(mn + base_name + '_route.js (PROTO)', '');
+        //GET EXPRESS SERVER & ROUTER
+        var express = require('express');
+        var router = express.Router();
 
-    //GET EXPRESS SERVER & ROUTER
-    var express = require('express');
-    var router = express.Router();
+        //GET LIBRARIES & NODE NATIVE MODULES
+        var path = require('path'),
+            _ = require('lodash'),
+            routes = require('../../config/routes.json'),
+            fs = require("fs");
 
-    //GET LIBRARIES & NODE NATIVE MODULES
-    var fs = require('fs'),
-        path = require('path'),
-        _ = require('lodash'),
-        routes = require('../../config/routes.json');
+        //Log names of files used
+        /**/console.log('template-data/' + base_name + "_tpldata.[js|json]");
+        /**/console.log('views/' + base_name + "_view.dust");
 
-    /**/console.log(mn + 'Got express server and all libs (PROTO)');
+        var tplDataPathBase = path.join('../template-data/' + base_name + '_tpldata');
+        var tplViewPath = path.join('../views/' + base_name + "_view.dust");
 
-    var context;
+        var context;
 
-    //TEMPLATE DATA
-    if (config.launchRoute === true) {
-      // :( - hack city bitch, hack hack city bitch
-      console.log("inside template data 'launchRoute is true'");
-      context = require(routes.tplData.dir + '/' + base_name + routes.tplData.filenmSuffix)();
-      console.log(mn + "\n" + "     ****&*&*&*&*&*&*&*&*&*&*&*****     ".green.bgWhite);
-      console.dir(context);
-      console.log(mn + "\n" + "     ****&*&*&*&*&*&*&*&*&*&*&*****     ".green.bgWhite);
-    } else {
-      context = require(routes.tplData.dir + '/' + base_name + routes.tplData.filenmSuffix);
-    }
+        try {
+            context = require(tplDataPathBase);
+            if (config.launchRoute === true) {
+                context = context();
+                /**/ //stdout.object_highlighted(context, mn, 5);
+            }
+        } catch (e) {
+            console.log(mn + e);
+            context = {};
+        }
 
-    /**/console.log(routes.tplData.dir + '/' + base_name + routes.tplData.filenmSuffix);
+        /****************************** ROUTES ******************************/
+        /* GET dataTpls ROOT PAGE */
+        router.get('/', function (req, resp, next) {
+            /**/console.log(mn + '(PROTO) REQUEST FOR /' + base_name);
+            resp.render(base_name + '_view', context);
+        });
 
-    /**/console.log(mn + '(PROTO) Got tmpl data.' /* + 'TEMPLATE DATA START' */);
-    /**/console.dir(context); /**/console.log(mn + '(PROTO) TEMPLATE DATA END');
+        router.post('/', function (req, resp, next) {
+            resp.send('OK\n');
+        });
+        /********************************************************************/
 
-    /****************************** ROUTES ******************************/
-    /* GET dataTpls ROOT PAGE */
-    router.get('/', function (req, resp, next) {
-      /**/console.log(mn + '(PROTO) REQUEST FOR /' + base_name);
-      resp.render(base_name + '_view', context);
-    });
+        // //@EXPORT
+        return router;
+    };
+    //##################################################################################
 
-    router.post('/', function (req, resp, next) {
-      resp.send('OK\n');
-    });
-    /********************************************************************/
-
-    // //@EXPORT
-    return router;
-  };
-  //##################################################################################
-
-  return route_prototype;
+    return route_prototype;
 })();

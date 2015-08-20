@@ -3,12 +3,20 @@
  * Loads the app components.
  * @return {Express} app: server object
  */
-'use strict';
+"use strict";
 
 (function setupExpressApp() {
 
     // LIBRARY MODULES
     var path = require('path');
+
+    /*<PATHS*/console.log("--------------------+process.env.PWD app.js+------------------------");
+    /*<PATHS*/console.log(process.env.PWD);
+    /*<PATHS*/console.log("--------------------+process.env.PWD+------------------------");
+    /*<PATHS*/process.env.PWD = path.join(process.env.PWD, "/build");
+    /*<PATHS*/console.log("--------------------+process.env.PWD app.js+------------------------");
+    /*<PATHS*/console.log(process.env.PWD);
+    /*<PATHS*/console.log("--------------------+process.env.PWD+------------------------");
 
     // EXPRESS SERVER
     // var livereload = require('express-livereload');
@@ -28,16 +36,15 @@
     require('models/redis.js');
 
     /****************** ROUTES & ROUTE-HANDLING MODULES *****************/
-    app.use(express['static'](path.join(__dirname, 'public')));
+    app.use(express["static"](path.join(__dirname, 'public')));
 
     var routes = require('../config/routes.json'); //Get route list
 
-    //uses route constructor on all routes registered in the config object
-    routes.topLevelRoutes.forEach(function (routeOptions) {
-        var file = routeOptions.file || routeOptions.route;
-        var routeConfig = routeOptions.routeConfig || {};
-
-        app.use('/' + routeOptions.route, require('routes/proto_route.js')(file, routeConfig));
+    //Constructs route for all routes registered in config/routes.json
+    routes.forEach(function (route) {
+        var file = route.file || route.request_path;
+        var routeConfig = route.routeConfig || {};
+        app.use('/' + route.request_path, require('routes/proto_route.js')(file, routeConfig));
     });
     /********************************************************************/
 

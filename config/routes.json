@@ -1,19 +1,30 @@
-{
-    "routeDir": "routes",
-    "routeSuffix": "_route",
-    "tplData": {
-        "dir": "template-data",
-        "filenmSuffix": "_tpldata"
+[
+    {
+        "request_path": "users2"
     },
-
-    "topLevelRoutes": [
-        {   "route": "users"            },
-        {   "route": "img-load-async"   },
-        {   "route": "login"            },
-        {   "route": "iife-tpl", 
-            "routeConfig": { "launchRoute": true } },
-        {   "route": "",
-            "file": "index"             }
-    ],
-    "testRoute": { "route": "iife-tpl" }
-}
+    {
+        "request_path": "users"
+    },
+    {
+        "request_path": "img-load-async"
+    },
+    {
+        "request_path": "login"
+    },
+    {
+        "request_path": "iife-tpl",
+        "routeConfig": {
+            "launchRoute": true
+        }
+    },
+    {
+        "request_path": "dust_obj-lit-ret",
+        "routeConfig": {
+            "launchRoute": true
+        }
+    },
+    {
+        "request_path": "",
+        "file": "index"
+    }
+]

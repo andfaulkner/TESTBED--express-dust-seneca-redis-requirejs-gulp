@@ -2,17 +2,17 @@ module.exports = function() {
 
 var colors = require('colors');
 
-console.log("******************* in iife-tpl-tpldata.js! ***************** ".green); 
+console.log("******************* in iife-tpl-tpldata.js! ***************** ".green);
 
+// get dust
 var kleiDust = require('klei-dust');
-
 var dust = kleiDust.getDust();
 var dust1 = require('dustjs-linkedin');
 
 var context = dust.makeBase();
 
-var newContext = context.push({ 
-        "foo": "barrrrrrrrrr!", 
+var newContext = context.push({
+        "foo": "barrrrrrrrrroooooooooo!",
         "one": {
             "two": "Hello!"
         }
@@ -43,7 +43,7 @@ return newContext.stack.head;
 //    "Hello": "allo allo!"
 //});
 
-}; 
+};
 
 
 

@@ -7,12 +7,15 @@ var path    = require('path'),
     merge   = require('merge2'),
     _       = require('lodash'),
     del     = require('del');
+var Bluebird = require('bluebird');
+var fsa     = Bluebird.promisifyAll(require('fs'));
+
 
 require('shelljs/global');
 
 //ECMA 6 POLYFILL
 require('babel/register');
-Object.getPrototypeOf.toString = function() { 
+Object.getPrototypeOf.toString = function() {
     return Object.toString();
 };
 
@@ -46,7 +49,7 @@ var p = require('gulp-packages')(gulp, [
     'plumber',                  // keep running if error occurs
     'print',                    // output errors to console
     'rename',                   // Rename files
-    'replace',                  // find-and-replace text in files 
+    'replace',                  // find-and-replace text in files
     'rimraf',                   // remove files
     'sass',                     // compile scss and sass --> css
     'shell',                    // run shell commands with gulp
@@ -96,11 +99,11 @@ args = (function populateArgs(argList, argObj){
  */
 onError = function onError(err) {
     gutil.beep();
-    console.log(gutil.colors.red.bgWhite("-----------------------------------"));
+    console.log(gutil.colors.red.bgWhite('-----------------------------------'));
     console.log('ERROR OCCURRED');
     console.log(typeof err);
     console.log(gutil.colors.red.bgWhite(err.toString()));
-    console.log(gutil.colors.red.bgWhite("-----------------------------------"));
+    console.log(gutil.colors.red.bgWhite('-----------------------------------'));
     this.emit('restart');
     this.emit('end');
 };
@@ -140,7 +143,10 @@ resolveSrcAndDest = function resolveSrcAndDest(fPath, opts) {
 //-----------------------------------------------------------------------//
 
 
-//------------------------ REUSABLE PIPE COMPONENTS ------------------------//
+
+//################################################################################
+//#~~~~~~~~~~~~~~~~~~~~~~~~~~~ REUSABLE PIPE COMPONENTS ~~~~~~~~~~~~~~~~~~~~~~~~~~
+//################################################################################
 catchErrors = lazypipe()
     .pipe(p.plumber, { errorHandler: onError });
 
@@ -167,7 +173,8 @@ rmDebugCode = lazypipe()
         /\/\*<\{\{DEBUG\*\/[\s\S]*?\/\*DEBUG\}\}\>\*\//gm, ''))
     .pipe(p.ifElse, !!args.production, p.replace.bind(this,
         /\/\*<\{\{TEST\*\/[\s\S]*?\/\*TEST\}\}\>\*\//gm, ''));
-//------------------------------------------------------------------------//
+//#################################################################################
+
 
 
 //################################################################################
@@ -200,21 +207,20 @@ gulp.task('js-build', function(){
 
     return consoleTaskReport()
         .pipe(merge(PATHS.js.map(function(files){
-      
-            let swpFilter = p.filter(['*', '!**/*.swp', '!**/*.*~']); 
-            let filePaths = resolveSrcAndDest(files, { ext: "js" });
+
+            let swpFilter = p.filter(['*', '!**/*.swp', '!**/*.*~']);
+            let filePaths = resolveSrcAndDest(files, { ext: 'js' });
             return gulp.src(filePaths.src)
                 .pipe(swpFilter)
                 .pipe(consoleTaskReport())
                 .pipe(p.babel({ compact: false }))
                     .on('error', onError)
-                .pipe(p.dev("got into js-build end!"))
+                .pipe(p.dev('got into js-build end!'))
                 .pipe(gulp.dest(filePaths.dest));
 
     }))).on('error', onError);
 });
 //#################################################################################
-
 
 
 /**
@@ -250,7 +256,168 @@ gulp.task('copy', function copy(){
 
 
 
-//************************ LIVERELOAD SERVER *************************//
+
+function openOrMake(filePath, isJSConfig, defaultData){
+    console.log('Entered openOrMake');
+
+    if (isJSConfig) {
+
+        //CB1
+        fs.open(filePath + '.js', 'r+', function tryToOpenJson(err, fd){
+            console.log('CB LAYER ONE');
+            if (err) {
+                console.log('no ' + filePath + '.js');
+
+                //CB2
+                return fs.open(filePath + '.json', 'r+', function(err, fd){
+                    console.log('CB LAYER TWO');
+                    if (err) {
+                        console.log('no ' + filePath + '.json');
+
+                        //CB3
+                        return fs.writeFile(filePath + '.json', defaultData, function(err){
+                            console.log('CB LAYER THREE');
+                            if (err) {
+                                return (function(){
+                                    console.log('ERROR in fs.writeFile on ' + filePath + '.json');
+                                    console.dir(err);
+                                }());
+                            }
+                            return console.log('new' + filePath + '.json file written!');
+                        });
+                        //END CB3
+
+                    } else return console.log(filePath + '.json already existed!');
+                });
+                //END CB2
+
+            } else return console.log(filePath + '.js already existed! Success!');
+        });
+        //END CB1
+
+        // //CB1
+        // fs.open(filePath + '.js', 'r+', function(err, fd){
+        //     console.log('CB LAYER ONE');
+        //     if (err) {
+        //         console.log('no ' + filePath + '.js');
+
+        //         //CB2
+        //         return fs.open(filePath + '.json', 'r+', function(err, fd){
+        //             console.log('CB LAYER TWO');
+        //             if (err) {
+        //                 console.log('no ' + filePath + '.json');
+
+        //                 //CB3
+        //                 return fs.writeFile(filePath + '.json', defaultData, function(err){
+        //                     console.log('CB LAYER THREE');
+        //                     if (err) {
+        //                         return (function(){
+        //                             console.log('ERROR in fs.writeFile on ' + filePath + '.json');
+        //                             console.dir(err);
+        //                         }());
+        //                     }
+        //                     return console.log('new' + filePath + '.json file written!');
+        //                 });
+        //                 //END CB3
+
+        //             } else return console.log(filePath + '.json already existed!');
+        //         });
+        //         //END CB2
+
+        //     } else return console.log(filePath + '.js already existed! Success!');
+        // });
+        // //END CB1
+
+
+    //if not js/json file
+    } else {
+
+        fs.open(filePath, 'r+', function (err, fd){
+            if (err) {
+
+                return fs.writeFile(filePath, defaultData, function(err) {
+                    if (err) return console.log('fs.writeFile ERROR: ' + filePath);
+                    return console.log('fs.writeFile success for ' + filePath);
+                });
+
+            }
+        });
+
+    }
+
+}
+
+
+
+
+
+gulp.task('makeRoutes', function makeRoutes(){
+    //***************** CREATE FILES IF THEY DON'T EXIST *****************//
+
+    var routes = require(path.join(__dirname, 'config/routes.json'));
+
+    var defJSON = '{"default":"default"}'; //def contents to write if no file
+
+    fs.readFile(path.join(__dirname, 'config/default_view_template.dust'),
+            function(err, dustTmplData) {
+        if (err) throw err;
+
+        routes.forEach(function(route) {
+            var fn = (route.file || route.request_path);
+            console.log(fn);
+            var tplDataPathNoExt = path.join(__dirname, 'src/template-data', fn + '_tpldata');
+            var tplViewPath = path.join(__dirname, 'src/views', fn + '_view.dust');
+
+            route.routeConfig = route.routeConfig || {};
+
+            var launchRoute = (route.routeConfig.launchRoute || false);
+            console.log(route);
+            console.log(tplDataPathNoExt);
+
+            openOrMake(tplDataPathNoExt, true, defJSON);
+            openOrMake(tplViewPath, false, dustTmplData);
+        });
+    });
+
+    console.log('past forEach');
+
+    // fs.openAsync(tplDataPathBase + '.js', 'r')
+    // .catch(Error, function(e)fs.openAsync.bind(this, tplDataPathBase + '.json'))
+    // .catch(fs.writeFileAsync.bind(this, tplDataPathBase + '.json',
+    //         '{"default":"default"}', function(){
+    //     console.log("wrote json!");
+    // }));
+
+    // ///////////////////////// EXPERIMENT /////////////////////////////
+    // fs.open('build/asdf.js', 'r+', function(err, fd){
+    //     if(err){
+    //         console.log("DID NOT !!!!!!!!!!!!!!!!!!!! OPEN asdf.js!");
+    //         console.dir(err);
+    //     } else {
+    //         console.log("!!!!!!!!!!!!!!!!!!!! OPENED asdf.js!");
+    //         console.dir(fd);
+    //     }
+    // });
+    // //////////////////////////////////////////////////////////////////
+
+
+
+
+    //********************************************************************//
+
+});
+
+
+
+
+
+
+
+
+
+//################################################################################
+//#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ LIVERELOAD SERVER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//################################################################################
 gulp.task('server', function livereloadServer(){
     livereload.listen();                    // listen for changes
     return consoleTaskReport()
@@ -271,7 +438,7 @@ gulp.task('server', function livereloadServer(){
         }));
 //).on('error', onError));
     });
-//********************************************************************//
+//#################################################################################
 
 
 gulp.task('watch', function(){
